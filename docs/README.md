@@ -2,22 +2,22 @@
 
 ## Ownership
 
-- escopo: rede, EKS, IAM/OIDC, ingress e observabilidade base
-- fora do escopo: dominio da aplicacao, migrations e Lambdas do edge
+- scope: networking, EKS, IAM/OIDC, ingress, and baseline observability
+- out of scope: application domain logic, migrations, and edge Lambdas
 
-## Estrutura inicial
+## Initial structure
 
-- `terraform/`: baseline de infraestrutura de plataforma
-- `kubernetes/`: manifestos base versionados no repositorio
-- `scripts/`: validacoes locais e de CI
+- `terraform/`: platform infrastructure baseline
+- `kubernetes/`: baseline manifests versioned in the repository
+- `scripts/`: local and CI validations
 
-## Ambientes
+## Environments
 
-- branch `stag` mapeada para GitHub environment `staging`
-- branch `prod` mapeada para GitHub environment `production`
-- naming AWS com sufixos `stag` e `prod`
+- branch `stag` maps to GitHub environment `staging`
+- branch `prod` maps to GitHub environment `production`
+- AWS naming uses `stag` and `prod` suffixes
 
-## Variaveis e secrets esperados por ambiente
+## Expected environment variables and secrets
 
 - `AWS_REGION`
 - `AWS_ROLE_ARN`
@@ -25,4 +25,3 @@
 - `INGRESS_DOMAIN`
 - `DATADOG_API_KEY`
 - `DATADOG_APP_KEY`
-

@@ -1,12 +1,11 @@
 ## Summary
 
-Descreva o escopo da mudanca e os recursos afetados.
+Describe the scope of the change and the affected resources.
 
 ## Checklist
 
-- [ ] respeita o ownership do repositorio
-- [ ] nao adiciona dominio da aplicacao nem Lambdas de edge
-- [ ] atualiza a documentacao local se necessario
-- [ ] validacao Terraform executada
-- [ ] validacao de manifestos Kubernetes executada
-
+- [ ] respects repository ownership
+- [ ] does not add application domain logic or edge Lambdas
+- [ ] updates local documentation when needed
+- [ ] Terraform validation executed
+- [ ] Kubernetes manifest validation executed

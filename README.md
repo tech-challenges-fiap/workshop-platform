@@ -1,26 +1,24 @@
 # workshop-platform
 
-Infraestrutura base de plataforma do projeto `workshop`.
+Platform baseline infrastructure for the `workshop` project.
 
-## Proposito
+## Purpose
 
-Este repositorio concentra VPC, EKS, IAM/OIDC, ingress, observabilidade base e
-capacidades compartilhadas da plataforma. Ele nao contem regra de negocio nem
-Lambdas de edge.
+This repository owns VPC, EKS, IAM/OIDC, ingress, baseline observability, and
+shared platform capabilities. It does not contain business logic or edge Lambdas.
 
-## Stack principal
+## Main stack
 
 - Terraform
 - Kubernetes
 - AWS
 
-## Estrategia de deploy
+## Deployment strategy
 
-- `feature/* -> stag`: Pull Request com validacao Terraform e manifestos
-- `stag -> prod`: Pull Request de promocao para `production`
-- autenticacao AWS via OIDC para pipelines
+- `feature/* -> stag`: Pull Request with Terraform validation and manifests
+- `stag -> prod`: promotion Pull Request into `production`
+- AWS OIDC authentication for pipelines
 
-## Documentacao local
+## Local documentation
 
 - [docs/README.md](docs/README.md)
-

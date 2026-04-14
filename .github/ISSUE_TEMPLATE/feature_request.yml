@@ -1,0 +1,24 @@
+name: Feature request
+description: Solicitar capacidade de plataforma.
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: Qual necessidade a plataforma deve atender?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencias e riscos
+

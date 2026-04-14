@@ -1,10 +1,9 @@
 output "name_prefix" {
-  description = "Prefixo padrao para recursos de plataforma."
+  description = "Default prefix for platform resources."
   value       = local.name_prefix
 }
 
 output "eks_cluster_name" {
-  description = "Nome canonico de referencia para o cluster EKS."
+  description = "Canonical reference name for the EKS cluster."
   value       = local.eks_cluster_name
 }
-

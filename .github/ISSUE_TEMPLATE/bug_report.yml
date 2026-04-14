@@ -1,5 +1,5 @@
 name: Bug report
-description: Reportar defeito na plataforma base.
+description: Report a defect in the platform baseline.
 title: "[bug] "
 labels:
   - bug
@@ -7,20 +7,19 @@ body:
   - type: textarea
     id: summary
     attributes:
-      label: Resumo
+      label: Summary
     validations:
       required: true
   - type: textarea
     id: impact
     attributes:
-      label: Impacto
-      description: Liste os ambientes e capacidades afetadas.
+      label: Impact
+      description: List the affected environments and capabilities.
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Como reproduzir
+      label: Reproduction steps
     validations:
       required: true
-

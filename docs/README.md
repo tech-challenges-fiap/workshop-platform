@@ -1,27 +1,26 @@
 # workshop-platform docs
 
-## Ownership
+This directory explains how `workshop-platform` should be developed and
+maintained as a standalone shared infrastructure repository.
 
-- scope: networking, EKS, IAM/OIDC, ingress, and baseline observability
-- out of scope: application domain logic, migrations, and edge Lambdas
+## Read This First
 
-## Initial structure
+- Start with [../README.md](../README.md) for the repository purpose, commands, and delivery flow.
+- Read [architecture.md](architecture.md) before deciding whether infrastructure work belongs here.
+- Read [development.md](development.md) before changing Terraform, Kubernetes manifests, or CI behavior.
+- Read [../AGENTS.md](../AGENTS.md) if you are using an AI agent in this repository.
 
-- `terraform/`: platform infrastructure baseline
-- `kubernetes/`: baseline manifests versioned in the repository
-- `scripts/`: local and CI validations
+## Document Map
 
-## Environments
+- [architecture.md](architecture.md) - current boundaries and platform architecture guidance
+- [development.md](development.md) - Terraform/Kubernetes workflow, validation commands, and doc rules
+- [../AGENTS.md](../AGENTS.md) - repo instructions for AI agents
+- [../.ai/project-context.md](../.ai/project-context.md) - compact AI-readable project context
+- [../.ai/contributing.md](../.ai/contributing.md) - AI-assisted change checklist
+- [../.ai/task-template.md](../.ai/task-template.md) - reusable task brief template
 
-- branch `stag` maps to GitHub environment `staging`
-- branch `prod` maps to GitHub environment `production`
-- AWS naming uses `stag` and `prod` suffixes
+## Who Should Read What
 
-## Expected environment variables and secrets
-
-- `AWS_REGION`
-- `AWS_ROLE_ARN`
-- `EKS_CLUSTER_NAME`
-- `INGRESS_DOMAIN`
-- `DATADOG_API_KEY`
-- `DATADOG_APP_KEY`
+- Engineers new to the repo: `README.md` then `development.md`
+- Engineers deciding ownership boundaries: `architecture.md`
+- AI-assisted contributors: `AGENTS.md` and `.ai/project-context.md`

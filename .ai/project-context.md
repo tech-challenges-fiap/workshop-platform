@@ -2,9 +2,8 @@
 
 ## Purpose
 
-`workshop-platform` is the shared infrastructure repository for the workshop
-split. It should own common platform capabilities rather than application,
-edge, or database-specific behavior.
+`workshop-platform` is the shared infrastructure repository. It owns common
+platform capabilities rather than application or database-specific behavior.
 
 ## Current State
 
@@ -13,11 +12,11 @@ edge, or database-specific behavior.
 - manifest validation script
 - CI validation for Terraform and manifest structure
 
-## Adjacent Repositories
+## Operating Constraint
 
-- `workshop-app`: application logic and service runtime
-- `workshop-edge`: edge adapters and external integrations
-- `workshop-db`: PostgreSQL provisioning
+- keep the repository focused on shared infrastructure
+- treat application behavior, handler implementation, and database provisioning as out of scope
+- document only resources and interfaces defined here
 
 ## Important Workflow
 

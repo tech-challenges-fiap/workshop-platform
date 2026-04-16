@@ -2,9 +2,9 @@
 
 ## Mission
 
-Work in `workshop-platform` as the shared infrastructure repository for the
-workshop split. Keep this repo focused on platform-level Terraform, Kubernetes
-baseline manifests, and shared delivery conventions.
+Work in `workshop-platform` as a shared infrastructure repository. Keep this
+repo focused on platform-level Terraform, Kubernetes baseline manifests, and
+shared delivery conventions.
 
 ## Scope Boundaries
 
@@ -18,11 +18,8 @@ In scope:
 Out of scope:
 
 - application runtime behavior
-- Lambda handlers and edge-specific integrations
-- PostgreSQL provisioning owned by `workshop-db`
-
-If a change belongs to `workshop-app`, `workshop-edge`, or `workshop-db`,
-document the dependency instead of moving that responsibility here.
+- handler implementation and edge-specific integrations
+- database provisioning
 
 ## Read First
 
@@ -54,7 +51,7 @@ correct.
 
 - Write docs and AI guidance in English
 - Do not invent platform resources that the repo does not define
-- Keep platform responsibilities separate from app, edge, and db concerns
+- Keep platform responsibilities separate from application, delivery, and database concerns
 - Treat target-state architecture as intent, not as implemented fact
 
 ## Documentation Expectations

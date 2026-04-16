@@ -14,4 +14,4 @@
 - repository boundary correctness
 - Terraform contract accuracy
 - Kubernetes manifest accuracy
-- no accidental application, edge, or database responsibility creep
+- no accidental scope creep into application, delivery, or database concerns

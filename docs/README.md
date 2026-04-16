@@ -1,7 +1,7 @@
 # workshop-platform docs
 
-This directory explains how `workshop-platform` should evolve into the shared
-infrastructure repository for the workshop platform split.
+This directory explains how `workshop-platform` should be developed and
+maintained as a standalone shared infrastructure repository.
 
 ## Read This First
 
@@ -12,7 +12,7 @@ infrastructure repository for the workshop platform split.
 
 ## Document Map
 
-- [architecture.md](architecture.md) - current boundaries, dependencies, and target platform role
+- [architecture.md](architecture.md) - current boundaries and platform architecture guidance
 - [development.md](development.md) - Terraform/Kubernetes workflow, validation commands, and doc rules
 - [../AGENTS.md](../AGENTS.md) - repo instructions for AI agents
 - [../.ai/project-context.md](../.ai/project-context.md) - compact AI-readable project context

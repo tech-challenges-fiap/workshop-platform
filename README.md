@@ -1,8 +1,8 @@
 # workshop-platform
 
-`workshop-platform` owns the shared infrastructure baseline for the `workshop`
-platform split. It is the future home for common platform capabilities such as
-cluster, networking, ingress, and baseline runtime policies.
+`workshop-platform` owns shared infrastructure for the `workshop` service. It
+holds common platform capabilities such as cluster, networking, ingress, and
+baseline runtime policies.
 
 ## What This Repository Owns
 
@@ -10,7 +10,7 @@ cluster, networking, ingress, and baseline runtime policies.
 - Kubernetes baseline manifests that belong to the platform layer
 - platform-focused CI validation and deployment workflow
 
-This repository does not own application domain logic, Lambda handlers, or
+This repository does not own application logic, handler implementation, or
 database instance provisioning.
 
 ## Current Scaffold Status

@@ -1,4 +1,3 @@
-bucket = "workshop-platform-prod-tfstate"
-key    = "terraform.tfstate"
+bucket = "workshop-platform-shared-tfstate"
+key    = "platform/terraform.tfstate"
 region = "us-east-1"
-

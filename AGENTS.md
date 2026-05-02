@@ -31,6 +31,7 @@ Out of scope:
 - `kubernetes/base/kustomization.yaml`
 - `kubernetes/base/namespaces.yaml`
 - `scripts/validate-k8s-manifests.sh`
+- `scripts/stop-platform-runtime.sh`
 
 ## Validation Commands
 
@@ -94,4 +95,5 @@ Update `README.md`, `docs/`, and `.ai/` when you change:
 - Kubernetes manifest layout
 - validation commands
 - deployment workflow behavior
+- runtime stop workflow behavior
 - repository boundaries

@@ -29,7 +29,9 @@ Out of scope:
 - `terraform/main.tf`
 - `terraform/variables.tf`
 - `kubernetes/base/kustomization.yaml`
+- `kubernetes/base/namespaces.yaml`
 - `scripts/validate-k8s-manifests.sh`
+- `scripts/stop-platform-runtime.sh`
 
 ## Validation Commands
 
@@ -38,12 +40,13 @@ cd terraform
 terraform fmt -check -recursive
 terraform init -backend=false
 terraform validate
-terraform plan -var="environment=stag" -var="repo=platform"
 cd ..
 ./scripts/validate-k8s-manifests.sh
 ```
 
-Run all relevant validation for any Terraform or Kubernetes change. For
+Run all relevant validation for any Terraform or Kubernetes change. Run
+`terraform plan -var-file=environments/stag/terraform.tfvars.example` only
+after initializing with a real backend and AWS credentials. For
 documentation-only changes, still verify that documented commands and paths are
 correct.
 
@@ -92,4 +95,5 @@ Update `README.md`, `docs/`, and `.ai/` when you change:
 - Kubernetes manifest layout
 - validation commands
 - deployment workflow behavior
+- runtime stop workflow behavior
 - repository boundaries

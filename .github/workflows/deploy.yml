@@ -12,32 +12,100 @@ permissions:
   id-token: write
 
 jobs:
+  validate-ref:
+    name: validate ref
+    runs-on: ubuntu-latest
+    outputs:
+      github_environment: ${{ steps.ref.outputs.github_environment }}
+    steps:
+      - name: Validate deploy branch
+        id: ref
+        run: |
+          set -euo pipefail
+
+          case "${GITHUB_REF_NAME}" in
+            stag)
+              echo "github_environment=staging" >> "${GITHUB_OUTPUT}"
+              ;;
+            prod)
+              echo "github_environment=production" >> "${GITHUB_OUTPUT}"
+              ;;
+            *)
+              echo "Deploy is only allowed from stag or prod branches." >&2
+              exit 1
+              ;;
+          esac
+
   deploy:
     name: deploy
+    needs: validate-ref
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref_name == 'stag' && 'staging' || 'production' }}
+      name: ${{ needs.validate-ref.outputs.github_environment }}
     defaults:
       run:
         working-directory: terraform
     env:
-      DEPLOY_ENV: ${{ github.ref_name == 'stag' && 'stag' || 'prod' }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      ENABLE_DATADOG: ${{ vars.ENABLE_DATADOG }}
+      TF_IN_AUTOMATION: true
+      TF_INPUT: false
+      TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+      TF_STATE_KEY: ${{ vars.TF_STATE_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
+      - name: Prepare backend config
+        run: |
+          set -euo pipefail
+
+          cat <<EOF > backend.hcl
+          bucket       = "${TF_STATE_BUCKET}"
+          key          = "${TF_STATE_KEY:-terraform.tfstate}"
+          region       = "${AWS_REGION}"
+          use_lockfile = true
+          EOF
+
+      - name: Prepare Terraform variables
+        run: |
+          set -euo pipefail
+
+          enable_datadog="${ENABLE_DATADOG:-false}"
+          datadog_api_key="${DATADOG_API_KEY:-}"
+
+          if [ "${enable_datadog}" = "true" ] && [ -z "${datadog_api_key}" ]; then
+            echo "DATADOG_API_KEY secret is required when ENABLE_DATADOG is true." >&2
+            exit 1
+          fi
+
+          jq -n \
+            --arg aws_region "${AWS_REGION}" \
+            --arg datadog_api_key "${datadog_api_key}" \
+            --argjson enable_datadog "${enable_datadog}" \
+            '{
+              aws_region: $aws_region,
+              datadog_api_key: (if $datadog_api_key == "" then null else $datadog_api_key end),
+              enable_datadog: $enable_datadog,
+              environment: "shared",
+              repo: "platform"
+            }' > ci.auto.tfvars.json
+
       - name: Terraform init
-        run: terraform init -backend=false
+        run: terraform init -backend-config=backend.hcl
 
       - name: Terraform plan
-        run: terraform plan -var="environment=${DEPLOY_ENV}" -var="repo=platform"
+        run: terraform plan -out=tfplan
 
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan

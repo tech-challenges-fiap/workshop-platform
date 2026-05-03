@@ -1,0 +1,10 @@
+aws_region     = "us-east-1"
+environment    = "shared"
+repo           = "platform"
+enable_datadog = false
+enable_nat_gateway = false
+node_subnet_tier   = "public"
+
+node_desired_size = 1
+node_max_size     = 1
+node_min_size     = 1

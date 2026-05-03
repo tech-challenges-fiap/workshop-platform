@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stag
+  labels:
+    app.kubernetes.io/managed-by: workshop-platform
+    workshop.fiap.io/environment: stag
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+  labels:
+    app.kubernetes.io/managed-by: workshop-platform
+    workshop.fiap.io/environment: prod

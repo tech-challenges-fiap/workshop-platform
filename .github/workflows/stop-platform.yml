@@ -1,0 +1,33 @@
+name: Stop Platform
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  stop:
+    name: stop shared platform
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      CLUSTER_NAME: workshop-platform-shared-cluster
+      NODEGROUP_NAME: workshop-platform-shared-default
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Stop shared platform runtime
+        run: ./scripts/stop-platform-runtime.sh

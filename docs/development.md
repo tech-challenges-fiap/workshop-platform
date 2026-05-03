@@ -61,6 +61,13 @@ The deploy workflow expects `AWS_REGION`, `AWS_ROLE_ARN`, `TF_STATE_BUCKET`,
 and key for both `stag` and `prod` GitHub environments so the repository keeps
 one shared cluster. When Datadog is enabled, set the `DATADOG_API_KEY` secret.
 
+`stop-platform.yml` can be run manually and is also scheduled nightly. It
+targets the shared cluster, so it reduces runtime capacity for both `stag` and
+`prod`. It calls the stop script to scale the managed node group to zero and
+delete the ingress-nginx Service, which releases the Network Load Balancer. It
+does not stop the EKS control plane; only Terraform destroy removes that hourly
+cluster cost.
+
 ## Branching and Delivery Expectations
 
 - Build features from `feature/*` or `codex/*` branches
@@ -68,6 +75,7 @@ one shared cluster. When Datadog is enabled, set the `DATADOG_API_KEY` secret.
 - Promote to `prod` only from `stag`
 - Expect `pr-validation.yml` to run Terraform validation and Kubernetes manifest checks
 - Expect `deploy.yml` to apply Terraform after merges to `stag` or `prod`
+- Expect stop workflows to reduce runtime cost outside demo windows without deleting Terraform-owned infrastructure state
 - Expect `promotion-source.yml` and `drift-report.yml` to protect production promotions
 
 ## Documentation Rules

@@ -70,11 +70,24 @@ environment should favor private node networking over minimum cost. Set
 `enable_datadog = true` and provide `datadog_api_key` through a secure tfvars
 source when Datadog should be installed.
 
+Reduce platform runtime cost when the cluster is not being used:
+
+```bash
+AWS_PROFILE=workshop-eks-admin AWS_REGION=sa-east-1 ./scripts/stop-platform-runtime.sh
+```
+
+The stop script targets the shared EKS cluster and affects both `stag` and
+`prod`. It scales the managed node group to zero and deletes the ingress-nginx
+Service so the Network Load Balancer is released. The EKS control plane itself
+cannot be stopped; destroy the Terraform stack when the cluster should stop
+incurring control-plane cost.
+
 ## Delivery Flow
 
 - `feature/* -> stag`: Pull Request validated by Terraform checks and Kubernetes manifest validation
 - `stag -> prod`: promotion Pull Request allowed only from `stag`
 - `push` to `stag` or `prod`: deployment workflow uses AWS OIDC and applies Terraform
+- `Stop Platform`: manual or scheduled workflow reduces shared cluster runtime cost for both `stag` and `prod`
 - `prod` Pull Requests: drift-report and promotion-source workflows enforce branch discipline
 - `Create Promotion PR`: manual workflow that opens the `stag` to `prod` promotion PR when one does not already exist
 

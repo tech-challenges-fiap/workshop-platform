@@ -90,6 +90,7 @@ incurring control-plane cost.
 - `stag -> prod`: promotion Pull Request allowed only from `stag`
 - `push` to `stag` or `prod`: deployment workflow uses AWS OIDC and applies Terraform
 - If the shared EKS cluster was deleted outside Terraform, the deployment workflow first restores the AWS/EKS targets and then applies the Kubernetes resources.
+- After apply, the deployment workflow updates kubeconfig and checks cluster reachability, `stag` and `prod` namespaces, ingress-nginx rollout health, and Datadog only when `ENABLE_DATADOG` is `true`.
 - `Stop Platform`: manual or scheduled workflow reduces shared cluster runtime cost for both `stag` and `prod`
 - `prod` Pull Requests: drift-report and promotion-source workflows enforce branch discipline
 - `Create Promotion PR`: manual workflow that opens the `stag` to `prod` promotion PR when one does not already exist

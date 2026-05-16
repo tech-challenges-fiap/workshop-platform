@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
   "label": "prod/stag",
-  "message": "drift",
-  "color": "fe7d37"
+  "message": "synced",
+  "color": "4c1"
 }

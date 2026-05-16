@@ -1,6 +1,6 @@
 # workshop-platform
 
-[![prod/stag](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftech-challenges-fiap%2Fworkshop-platform%2Fbadges%2Fbadges%2Fprod-stag-sync.json)](https://github.com/tech-challenges-fiap/workshop-platform/compare/prod...stag)
+[![prod/stag](https://raw.githubusercontent.com/tech-challenges-fiap/workshop-platform/badges/badges/prod-stag-sync.svg)](https://github.com/tech-challenges-fiap/workshop-platform/compare/prod...stag)
 
 `workshop-platform` owns shared AWS and Kubernetes infrastructure for the
 `workshop` service. It provisions the platform layer used by application and

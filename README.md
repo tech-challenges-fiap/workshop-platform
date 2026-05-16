@@ -1,5 +1,7 @@
 # workshop-platform
 
+[![Prod/Stag sync](https://github.com/tech-challenges-fiap/workshop-platform/actions/workflows/branch-sync.yml/badge.svg)](https://github.com/tech-challenges-fiap/workshop-platform/actions/workflows/branch-sync.yml)
+
 `workshop-platform` owns shared AWS and Kubernetes infrastructure for the
 `workshop` service. It provisions the platform layer used by application and
 edge repositories, without owning application code or database instances.

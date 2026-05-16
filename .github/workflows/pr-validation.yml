@@ -8,14 +8,25 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   terraform:
     name: terraform
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.base_ref == 'prod' && 'production' || 'staging' }}
     defaults:
       run:
         working-directory: terraform
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      ENABLE_DATADOG: ${{ vars.ENABLE_DATADOG }}
+      TF_IN_AUTOMATION: true
+      TF_INPUT: false
+      TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+      TF_STATE_KEY: ${{ vars.TF_STATE_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,14 +34,58 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Prepare backend config
+        run: |
+          set -euo pipefail
+
+          cat <<EOF > backend.hcl
+          bucket       = "${TF_STATE_BUCKET}"
+          key          = "${TF_STATE_KEY:-terraform.tfstate}"
+          region       = "${AWS_REGION}"
+          use_lockfile = true
+          EOF
+
+      - name: Prepare Terraform variables
+        run: |
+          set -euo pipefail
+
+          enable_datadog="${ENABLE_DATADOG:-false}"
+          datadog_api_key="${DATADOG_API_KEY:-}"
+
+          if [ "${enable_datadog}" = "true" ] && [ -z "${datadog_api_key}" ]; then
+            echo "DATADOG_API_KEY secret is required when ENABLE_DATADOG is true." >&2
+            exit 1
+          fi
+
+          jq -n \
+            --arg aws_region "${AWS_REGION}" \
+            --arg datadog_api_key "${datadog_api_key}" \
+            --argjson enable_datadog "${enable_datadog}" \
+            '{
+              aws_region: $aws_region,
+              datadog_api_key: (if $datadog_api_key == "" then null else $datadog_api_key end),
+              enable_datadog: $enable_datadog,
+              environment: "shared",
+              repo: "platform"
+            }' > ci.auto.tfvars.json
+
       - name: Terraform fmt
         run: terraform fmt -check -recursive
 
       - name: Terraform init
-        run: terraform init -backend=false
+        run: terraform init -backend-config=backend.hcl
 
       - name: Terraform validate
         run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -refresh=false
 
   kubernetes:
     name: kubernetes
@@ -41,4 +96,3 @@ jobs:
 
       - name: Validate manifest structure
         run: ./scripts/validate-k8s-manifests.sh
-

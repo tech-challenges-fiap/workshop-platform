@@ -135,3 +135,26 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve tfplan
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Smoke check platform
+        run: |
+          set -euo pipefail
+
+          cluster_name="$(terraform output -raw cluster_name)"
+          aws eks update-kubeconfig --region "${AWS_REGION}" --name "${cluster_name}"
+
+          kubectl cluster-info
+          kubectl get namespace stag
+          kubectl get namespace prod
+          kubectl -n ingress-nginx rollout status deployment/ingress-nginx-controller --timeout=180s
+          kubectl -n ingress-nginx get service ingress-nginx-controller
+
+          if [ "${ENABLE_DATADOG:-false}" = "true" ]; then
+            kubectl get namespace datadog
+            kubectl -n datadog rollout status daemonset/datadog --timeout=180s
+          else
+            echo "Datadog smoke check skipped because ENABLE_DATADOG is not true."
+          fi

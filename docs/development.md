@@ -54,6 +54,7 @@ Do not add database resources here. Use `vpc_id`, `private_subnet_ids`, and
 
 - `pr-validation.yml` runs Terraform formatting, initialization, validation, and manifest validation.
 - `deploy.yml` runs on `stag` and `prod`, prepares backend configuration from GitHub variables, plans, and applies the shared Terraform stack.
+- When the shared EKS cluster is missing but still present in Terraform state, `deploy.yml` restores the AWS/EKS targets before planning the Kubernetes and Helm resources.
 - `promotion-source.yml` and `drift-report.yml` protect the production promotion path.
 
 The deploy workflow expects `AWS_REGION`, `AWS_ROLE_ARN`, `TF_STATE_BUCKET`,

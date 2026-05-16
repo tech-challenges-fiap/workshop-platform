@@ -104,6 +104,32 @@ jobs:
       - name: Terraform init
         run: terraform init -backend-config=backend.hcl
 
+      - name: Restore missing EKS cluster
+        run: |
+          set -euo pipefail
+
+          cluster_name="$(terraform output -raw cluster_name 2>/dev/null || true)"
+          if [ -z "${cluster_name}" ]; then
+            cluster_name="workshop-platform-shared-cluster"
+          fi
+
+          describe_error="$(mktemp)"
+          if aws eks describe-cluster --region "${AWS_REGION}" --name "${cluster_name}" >/dev/null 2>"${describe_error}"; then
+            echo "EKS cluster ${cluster_name} exists."
+            rm -f "${describe_error}"
+            exit 0
+          fi
+
+          if ! grep -q "ResourceNotFoundException" "${describe_error}"; then
+            cat "${describe_error}" >&2
+            rm -f "${describe_error}"
+            exit 1
+          fi
+
+          rm -f "${describe_error}"
+          echo "EKS cluster ${cluster_name} is missing; restoring AWS/EKS resources before Kubernetes resources."
+          terraform apply -auto-approve -target=module.network -target=module.eks
+
       - name: Terraform plan
         run: terraform plan -out=tfplan
 

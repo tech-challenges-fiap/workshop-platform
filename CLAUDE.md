@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Purpose and Scope
+## Overview
 
 `workshop-platform` owns shared AWS and Kubernetes infrastructure for the `workshop` service. It provisions the platform layer consumed by `workshop-app`, `workshop-edge`, and `workshop-db` — but does not own application code, Lambda handlers, or database instances.
 
@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Out of scope:** application runtime behavior, edge handler logic, database provisioning.
 
-## Validation Commands
+## Commands
 
 Run before proposing any Terraform or Kubernetes change (no AWS credentials required):
 
@@ -72,7 +72,7 @@ The stack exposes these outputs consumed by dependent repos:
 - **`create-promotion-pr.yml`** — Manual workflow to open the `stag → prod` PR (requires `PROMOTION_PR_TOKEN` secret)
 - **`drift-report.yml`** / **`promotion-source.yml`** — Guard `prod` to allow only `stag`-based PRs
 
-## Workflow Rules
+## Branching and Delivery
 
 - Always `git fetch origin --prune` before starting work; branch from updated `origin/stag`.
 - Open all feature, fix, docs, and maintenance PRs into `stag` — never directly to `prod`.
@@ -81,6 +81,6 @@ The stack exposes these outputs consumed by dependent repos:
 - Before saying a task is done, check the PR's required CI statuses. If CI fails, attempt one fix; if still failing, stop and report the details.
 - When reporting completion, include: branch name, PR URL, CI status, and any remaining blocker.
 
-## Documentation Expectations
+## Documentation
 
 Update `README.md`, `docs/`, and `.ai/` when changing Terraform interfaces, Kubernetes manifest layout, validation commands, workflow behavior, or repository boundaries.

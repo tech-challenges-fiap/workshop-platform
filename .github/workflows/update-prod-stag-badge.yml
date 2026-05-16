@@ -41,15 +41,39 @@ jobs:
 
           if git diff --quiet origin/prod origin/stag -- .; then
             message="synced"
-            color="brightgreen"
+            color="4c1"
           else
             message="drift"
-            color="orange"
+            color="fe7d37"
           fi
 
           printf '{\n  "schemaVersion": 1,\n  "label": "prod/stag",\n  "message": "%s",\n  "color": "%s"\n}\n' \
             "${message}" \
             "${color}" > badge-output/badges/prod-stag-sync.json
+
+          cat > badge-output/badges/prod-stag-sync.svg <<SVG
+          <svg xmlns="http://www.w3.org/2000/svg" width="104" height="20" role="img" aria-label="prod/stag: ${message}">
+            <title>prod/stag: ${message}</title>
+            <linearGradient id="s" x2="0" y2="100%">
+              <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+              <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <clipPath id="r">
+              <rect width="104" height="20" rx="3" fill="#fff"/>
+            </clipPath>
+            <g clip-path="url(#r)">
+              <rect width="63" height="20" fill="#555"/>
+              <rect x="63" width="41" height="20" fill="#${color}"/>
+              <rect width="104" height="20" fill="url(#s)"/>
+            </g>
+            <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
+              <text x="31.5" y="15" fill="#010101" fill-opacity=".3">prod/stag</text>
+              <text x="31.5" y="14">prod/stag</text>
+              <text x="82.5" y="15" fill="#010101" fill-opacity=".3">${message}</text>
+              <text x="82.5" y="14">${message}</text>
+            </g>
+          </svg>
+          SVG
 
           cat badge-output/badges/prod-stag-sync.json
 
@@ -59,6 +83,7 @@ jobs:
 
           tmpdir="$(mktemp -d)"
           cp badge-output/badges/prod-stag-sync.json "${tmpdir}/prod-stag-sync.json"
+          cp badge-output/badges/prod-stag-sync.svg "${tmpdir}/prod-stag-sync.svg"
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -75,8 +100,9 @@ jobs:
 
           mkdir -p badges
           cp "${tmpdir}/prod-stag-sync.json" badges/prod-stag-sync.json
+          cp "${tmpdir}/prod-stag-sync.svg" badges/prod-stag-sync.svg
 
-          git add badges/prod-stag-sync.json
+          git add badges/prod-stag-sync.json badges/prod-stag-sync.svg
 
           if git diff --cached --quiet; then
             echo "Badge payload already up to date."

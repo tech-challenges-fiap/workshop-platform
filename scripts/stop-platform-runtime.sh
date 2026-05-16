@@ -13,14 +13,27 @@ if ! command -v aws >/dev/null 2>&1; then
   exit 1
 fi
 
-nodegroup_status="$(
+describe_error="$(mktemp)"
+if ! nodegroup_status="$(
   aws eks describe-nodegroup \
     --region "${AWS_REGION}" \
     --cluster-name "${CLUSTER_NAME}" \
     --nodegroup-name "${NODEGROUP_NAME}" \
     --query 'nodegroup.status' \
-    --output text
-)"
+    --output text \
+    2>"${describe_error}"
+)"; then
+  if grep -q "ResourceNotFoundException" "${describe_error}"; then
+    echo "Cluster ${CLUSTER_NAME} or node group ${NODEGROUP_NAME} is already absent; nothing to stop."
+    rm -f "${describe_error}"
+    exit 0
+  fi
+
+  cat "${describe_error}" >&2
+  rm -f "${describe_error}"
+  exit 1
+fi
+rm -f "${describe_error}"
 
 case "${nodegroup_status}" in
   ACTIVE)

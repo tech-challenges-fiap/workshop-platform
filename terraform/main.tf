@@ -44,14 +44,10 @@ module "eks" {
 
 data "aws_eks_cluster" "platform" {
   name = module.eks.cluster_name
-
-  depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "platform" {
   name = module.eks.cluster_name
-
-  depends_on = [module.eks]
 }
 
 resource "kubernetes_namespace_v1" "environment" {

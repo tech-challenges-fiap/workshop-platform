@@ -31,14 +31,6 @@ terraform init -reconfigure -backend-config=environments/stag/backend.hcl.exampl
 terraform plan -var-file=environments/stag/terraform.tfvars.example
 ```
 
-Reduce runtime cost when the cluster is idle:
-
-```bash
-AWS_PROFILE=workshop-eks-admin AWS_REGION=sa-east-1 ./scripts/stop-platform-runtime.sh
-```
-
-This scales the node group to zero and releases the NLB. The EKS control plane keeps running; destroy the Terraform stack to stop it entirely.
-
 ## Architecture
 
 ### Infrastructure Stack
@@ -68,7 +60,6 @@ The stack exposes these outputs consumed by dependent repos:
 
 - **`pr-validation.yml`** — Terraform fmt/init/validate + K8s manifest validation on every PR
 - **`deploy.yml`** — Applies Terraform on push to `stag` or `prod` via AWS OIDC; includes cluster-restoration logic when the EKS cluster was deleted outside Terraform
-- **`stop-platform.yml`** — Manual or scheduled cost-reduction workflow
 - **`create-promotion-pr.yml`** — Manual workflow to open the `stag → prod` PR (requires `PROMOTION_PR_TOKEN` secret)
 - **`drift-report.yml`** / **`promotion-source.yml`** — Guard `prod` to allow only `stag`-based PRs
 

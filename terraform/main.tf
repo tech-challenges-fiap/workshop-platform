@@ -97,6 +97,10 @@ resource "helm_release" "datadog" {
       value = "true"
     },
     {
+      name  = "datadog.logs.containerCollectAll"
+      value = "true"
+    },
+    {
       name  = "datadog.apm.portEnabled"
       value = "true"
     },
@@ -105,8 +109,32 @@ resource "helm_release" "datadog" {
       value = "true"
     },
     {
+      name  = "datadog.otlp.receiver.protocols.grpc.enabled"
+      value = "true"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.grpc.endpoint"
+      value = "0.0.0.0:4317"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.grpc.useHostPort"
+      value = "true"
+    },
+    {
+      name  = "datadog.env[0].name"
+      value = "DD_ENV"
+    },
+    {
+      name  = "datadog.env[0].valueFrom.fieldRef.fieldPath"
+      value = "metadata.namespace"
+    },
+    {
       name  = "datadog.clusterName"
       value = module.eks.cluster_name
+    },
+    {
+      name  = "datadog.tags[0]"
+      value = "project:workshop"
     }
   ]
 
@@ -118,6 +146,15 @@ resource "helm_release" "datadog" {
   ]
 
   depends_on = [module.eks]
+}
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  enable               = var.enable_datadog
+  service_name         = "workshop-app"
+  edge_service_name    = "workshop-edge"
+  notification_targets = var.datadog_notification_targets
 }
 
 data "kubernetes_service_v1" "ingress_nginx_controller" {

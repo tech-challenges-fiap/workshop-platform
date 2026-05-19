@@ -48,6 +48,7 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
       ENABLE_DATADOG: ${{ vars.ENABLE_DATADOG }}
       TF_IN_AUTOMATION: true
       TF_INPUT: false
@@ -83,19 +84,27 @@ jobs:
 
           enable_datadog="${ENABLE_DATADOG:-false}"
           datadog_api_key="${DATADOG_API_KEY:-}"
+          datadog_app_key="${DATADOG_APP_KEY:-}"
 
           if [ "${enable_datadog}" = "true" ] && [ -z "${datadog_api_key}" ]; then
             echo "DATADOG_API_KEY secret is required when ENABLE_DATADOG is true." >&2
             exit 1
           fi
 
+          if [ "${enable_datadog}" = "true" ] && [ -z "${datadog_app_key}" ]; then
+            echo "DATADOG_APP_KEY secret is required when ENABLE_DATADOG is true." >&2
+            exit 1
+          fi
+
           jq -n \
             --arg aws_region "${AWS_REGION}" \
             --arg datadog_api_key "${datadog_api_key}" \
+            --arg datadog_app_key "${datadog_app_key}" \
             --argjson enable_datadog "${enable_datadog}" \
             '{
               aws_region: $aws_region,
               datadog_api_key: (if $datadog_api_key == "" then null else $datadog_api_key end),
+              datadog_app_key: (if $datadog_app_key == "" then null else $datadog_app_key end),
               enable_datadog: $enable_datadog,
               environment: "shared",
               repo: "platform"

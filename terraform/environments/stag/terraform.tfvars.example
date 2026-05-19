@@ -1,7 +1,7 @@
 aws_region     = "us-east-1"
 environment    = "shared"
 repo           = "platform"
-enable_datadog = false
+enable_datadog = true
 enable_nat_gateway = false
 node_subnet_tier   = "public"
 

@@ -143,3 +143,21 @@ variable "datadog_api_key" {
     error_message = "datadog_api_key must be set when enable_datadog is true."
   }
 }
+
+variable "datadog_app_key" {
+  description = "Datadog application key required by the Datadog provider to manage dashboards and monitors."
+  type        = string
+  default     = null
+  sensitive   = true
+
+  validation {
+    condition     = !var.enable_datadog || var.datadog_app_key != null
+    error_message = "datadog_app_key must be set when enable_datadog is true."
+  }
+}
+
+variable "datadog_notification_targets" {
+  description = "List of Datadog notification targets for monitors (e.g. @slack-channel, @user@email.com)."
+  type        = list(string)
+  default     = []
+}

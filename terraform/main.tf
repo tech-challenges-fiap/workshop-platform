@@ -90,6 +90,9 @@ resource "helm_release" "datadog" {
   repository       = "https://helm.datadoghq.com"
   chart            = "datadog"
   version          = var.datadog_chart_version
+  timeout          = 600
+  wait             = true
+  wait_for_jobs    = false
 
   set = [
     {
@@ -122,7 +125,7 @@ resource "helm_release" "datadog" {
     },
     {
       name  = "datadog.otlp.receiver.protocols.grpc.useHostPort"
-      value = "true"
+      value = "false"
     },
     {
       name  = "datadog.env[0].name"

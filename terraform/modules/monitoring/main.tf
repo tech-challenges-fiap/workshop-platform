@@ -97,7 +97,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Endpoint Success Rate"
           requests = [
             {
-              q          = "100 * (sum:trace.http.request.hits{service:${var.service_name},resource_name:GET /health,http.status_code:200}.as_count() / sum:trace.http.request.hits{service:${var.service_name},resource_name:GET /health}.as_count())"
+              q          = "100 * (sum:trace.http.request.hits{service:${var.service_name},resource_name:\"get /health\",http.status_code:200}.as_count() / sum:trace.http.request.hits{service:${var.service_name},resource_name:\"get /health\"}.as_count())"
               aggregator = "avg"
             }
           ]
@@ -110,7 +110,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Check Responses Over Time"
           requests = [
             {
-              q            = "sum:trace.http.request.hits{service:${var.service_name},resource_name:GET /health} by {http.status_code}.as_count()"
+              q            = "sum:trace.http.request.hits{service:${var.service_name},resource_name:\"get /health\"} by {http.status_code}.as_count()"
               display_type = "bars"
             }
           ]

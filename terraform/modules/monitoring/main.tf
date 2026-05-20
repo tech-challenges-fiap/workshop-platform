@@ -231,7 +231,7 @@ resource "datadog_monitor" "service_down" {
   type    = "query alert"
   message = "Service ${var.service_name} health endpoint is returning errors. ${local.notify_targets}"
 
-  query = "avg(last_2m):sum:trace.http.request.hits{service:${var.service_name},http.status_code:200}.as_count() < 1"
+  query = "sum(last_2m):sum:trace.http.request.hits{service:${var.service_name},http.status_code:200}.as_count() < 1"
 
   monitor_thresholds {
     critical = 1

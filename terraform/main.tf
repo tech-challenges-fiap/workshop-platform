@@ -97,6 +97,10 @@ resource "helm_release" "datadog" {
       value = "true"
     },
     {
+      name  = "datadog.site"
+      value = "us5.datadoghq.com"
+    },
+    {
       name  = "datadog.logs.containerCollectAll"
       value = "true"
     },

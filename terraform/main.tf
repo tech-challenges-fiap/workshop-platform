@@ -91,7 +91,7 @@ resource "helm_release" "datadog" {
   chart            = "datadog"
   version          = var.datadog_chart_version
   timeout          = 600
-  wait             = true
+  wait             = false
   wait_for_jobs    = false
 
   set = [

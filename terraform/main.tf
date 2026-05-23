@@ -155,6 +155,10 @@ resource "helm_release" "datadog" {
     {
       name  = "datadog.tags[0]"
       value = "project:workshop"
+    },
+    {
+      name  = "agents.podAnnotations.config-version"
+      value = "otlp-http-v1"
     }
   ]
 

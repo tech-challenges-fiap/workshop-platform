@@ -44,14 +44,10 @@ module "eks" {
 
 data "aws_eks_cluster" "platform" {
   name = module.eks.cluster_name
-
-  depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "platform" {
   name = module.eks.cluster_name
-
-  depends_on = [module.eks]
 }
 
 resource "kubernetes_namespace_v1" "environment" {
@@ -94,10 +90,22 @@ resource "helm_release" "datadog" {
   repository       = "https://helm.datadoghq.com"
   chart            = "datadog"
   version          = var.datadog_chart_version
+  timeout          = 600
+  wait             = false
+  wait_for_jobs    = false
+  recreate_pods    = true
 
   set = [
     {
       name  = "datadog.logs.enabled"
+      value = "true"
+    },
+    {
+      name  = "datadog.site"
+      value = "us5.datadoghq.com"
+    },
+    {
+      name  = "datadog.logs.containerCollectAll"
       value = "true"
     },
     {
@@ -109,8 +117,48 @@ resource "helm_release" "datadog" {
       value = "true"
     },
     {
+      name  = "datadog.otlp.receiver.protocols.grpc.enabled"
+      value = "true"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.grpc.endpoint"
+      value = "0.0.0.0:4317"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.grpc.useHostPort"
+      value = "true"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.http.enabled"
+      value = "true"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.http.endpoint"
+      value = "0.0.0.0:4318"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.http.useHostPort"
+      value = "true"
+    },
+    {
+      name  = "datadog.env[0].name"
+      value = "DD_ENV"
+    },
+    {
+      name  = "datadog.env[0].valueFrom.fieldRef.fieldPath"
+      value = "metadata.namespace"
+    },
+    {
       name  = "datadog.clusterName"
       value = module.eks.cluster_name
+    },
+    {
+      name  = "datadog.tags[0]"
+      value = "project:workshop"
+    },
+    {
+      name  = "agents.podAnnotations.config-version"
+      value = "otlp-http-v1"
     }
   ]
 
@@ -122,6 +170,15 @@ resource "helm_release" "datadog" {
   ]
 
   depends_on = [module.eks]
+}
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  enable               = var.enable_datadog
+  service_name         = "workshop-app"
+  edge_service_name    = "workshop-edge"
+  notification_targets = var.datadog_notification_targets
 }
 
 data "kubernetes_service_v1" "ingress_nginx_controller" {

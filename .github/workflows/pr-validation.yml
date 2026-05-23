@@ -41,4 +41,3 @@ jobs:
 
       - name: Validate manifest structure
         run: ./scripts/validate-k8s-manifests.sh
-

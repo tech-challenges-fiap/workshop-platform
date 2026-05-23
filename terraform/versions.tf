@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = "~> 3.52"
+    }
     helm = {
       source  = "hashicorp/helm"
       version = "~> 3.0"
@@ -43,4 +47,12 @@ provider "helm" {
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.platform.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.platform.token
   }
+}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.us5.datadoghq.com/"
+
+  validate = var.enable_datadog
 }

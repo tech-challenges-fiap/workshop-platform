@@ -125,7 +125,7 @@ resource "helm_release" "datadog" {
     },
     {
       name  = "datadog.otlp.receiver.protocols.grpc.useHostPort"
-      value = "false"
+      value = "true"
     },
     {
       name  = "datadog.env[0].name"

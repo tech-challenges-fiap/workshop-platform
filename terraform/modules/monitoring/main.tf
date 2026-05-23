@@ -8,7 +8,7 @@ resource "datadog_dashboard_json" "api_latency" {
     description = "p50/p95/p99 latency of workshop-app endpoints"
     layout_type = "ordered"
     template_variables = [
-      { name = "env", prefix = "env", default = "stag" }
+      { name = "env", prefix = "env", default = "*" }
     ]
     widgets = [
       {
@@ -94,7 +94,7 @@ resource "datadog_dashboard_json" "health_uptime" {
     description = "/health success rate and uptime"
     layout_type = "ordered"
     template_variables = [
-      { name = "env", prefix = "env", default = "stag" }
+      { name = "env", prefix = "env", default = "*" }
     ]
     widgets = [
       {
@@ -134,7 +134,7 @@ resource "datadog_dashboard_json" "business_orders" {
     description = "Daily order volume and average time per status"
     layout_type = "ordered"
     template_variables = [
-      { name = "env", prefix = "env", default = "stag" }
+      { name = "env", prefix = "env", default = "*" }
     ]
     widgets = [
       {
@@ -185,7 +185,7 @@ resource "datadog_dashboard_json" "errors_integrations" {
     description = "5xx rate, integration errors, auth failures"
     layout_type = "ordered"
     template_variables = [
-      { name = "env", prefix = "env", default = "stag" }
+      { name = "env", prefix = "env", default = "*" }
     ]
     widgets = [
       {

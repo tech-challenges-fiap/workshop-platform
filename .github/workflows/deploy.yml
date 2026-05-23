@@ -150,6 +150,21 @@ jobs:
             echo "No stale lock found."
           fi
 
+      - name: Fix stuck Helm releases
+        run: |
+          set -euo pipefail
+
+          cluster_name="$(terraform output -raw cluster_name 2>/dev/null || echo 'workshop-platform-shared-cluster')"
+          aws eks update-kubeconfig --region "${AWS_REGION}" --name "${cluster_name}" || exit 0
+
+          # Check if helm release 'datadog' is stuck in pending state
+          if helm status datadog -n datadog 2>/dev/null | grep -qE 'pending-install|pending-upgrade|pending-rollback'; then
+            echo "⚠️ Helm release 'datadog' is stuck, rolling back..."
+            helm rollback datadog 0 -n datadog || helm uninstall datadog -n datadog --no-hooks || true
+          else
+            echo "No stuck Helm releases found."
+          fi
+
       - name: Terraform plan
         run: terraform plan -out=tfplan
 

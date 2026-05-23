@@ -14,17 +14,17 @@ resource "datadog_dashboard_json" "api_latency" {
           title = "Request Latency (p50/p95/p99)"
           requests = [
             {
-              q            = "avg:trace.http.request.duration.by.service.p50{service:${var.service_name}} by {resource_name}"
+              q            = "p50:trace.http.server.request{service:${var.service_name}} by {resource_name}"
               display_type = "line"
               style        = { palette = "cool" }
             },
             {
-              q            = "avg:trace.http.request.duration.by.service.p95{service:${var.service_name}} by {resource_name}"
+              q            = "p95:trace.http.server.request{service:${var.service_name}} by {resource_name}"
               display_type = "line"
               style        = { palette = "warm" }
             },
             {
-              q            = "avg:trace.http.request.duration.by.service.p99{service:${var.service_name}} by {resource_name}"
+              q            = "p99:trace.http.server.request{service:${var.service_name}} by {resource_name}"
               display_type = "line"
               style        = { palette = "orange" }
             }
@@ -97,7 +97,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Endpoint Success Rate"
           requests = [
             {
-              q          = "100 * (sum:trace.http.request.hits{service:${var.service_name},http.status_code:200}.as_count() / sum:trace.http.request.hits{service:${var.service_name}}.as_count())"
+              q          = "100 * (sum:trace.http.server.request.hits{service:${var.service_name},http.status_code:200}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name}}.as_count())"
               aggregator = "avg"
             }
           ]
@@ -110,7 +110,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Check Responses Over Time"
           requests = [
             {
-              q            = "sum:trace.http.request.hits{service:${var.service_name}} by {http.status_code}.as_count()"
+              q            = "sum:trace.http.server.request.hits{service:${var.service_name}} by {http.status_code}.as_count()"
               display_type = "bars"
             }
           ]
@@ -182,7 +182,7 @@ resource "datadog_dashboard_json" "errors_integrations" {
           title = "5xx Error Rate"
           requests = [
             {
-              q            = "sum:trace.http.request.errors{service:${var.service_name}}.as_count()"
+              q            = "sum:trace.http.server.request.errors{service:${var.service_name}}.as_count()"
               display_type = "bars"
               style        = { palette = "red" }
             }
@@ -231,7 +231,7 @@ resource "datadog_monitor" "service_down" {
   type    = "query alert"
   message = "Service ${var.service_name} health endpoint is returning errors. ${local.notify_targets}"
 
-  query = "sum(last_2m):sum:trace.http.request.hits{service:${var.service_name},http.status_code:200}.as_count() < 1"
+  query = "sum(last_2m):sum:trace.http.server.request.hits{service:${var.service_name},http.status_code:200}.as_count() < 1"
 
   monitor_thresholds {
     critical = 1
@@ -250,7 +250,7 @@ resource "datadog_monitor" "error_rate_spike" {
   type    = "metric alert"
   message = "High 5xx error rate detected for ${var.service_name}. ${local.notify_targets}"
 
-  query = "avg(last_5m):( sum:trace.http.request.errors{service:${var.service_name}}.as_count() / sum:trace.http.request.hits{service:${var.service_name}}.as_count() ) * 100 > 5"
+  query = "avg(last_5m):( sum:trace.http.server.request.errors{service:${var.service_name}}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name}}.as_count() ) * 100 > 5"
 
   monitor_thresholds {
     critical = 5

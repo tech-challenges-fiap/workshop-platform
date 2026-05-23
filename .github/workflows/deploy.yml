@@ -139,6 +139,17 @@ jobs:
           echo "EKS cluster ${cluster_name} is missing; restoring AWS/EKS resources before Kubernetes resources."
           terraform apply -auto-approve -target=module.network -target=module.eks
 
+      - name: Break stale state lock
+        run: |
+          set -euo pipefail
+          lock_file="s3://${TF_STATE_BUCKET}/${TF_STATE_KEY:-terraform.tfstate}.tflock"
+          if aws s3 ls "${lock_file}" >/dev/null 2>&1; then
+            echo "⚠️ Stale lock detected at ${lock_file}, removing..."
+            aws s3 rm "${lock_file}"
+          else
+            echo "No stale lock found."
+          fi
+
       - name: Terraform plan
         run: terraform plan -out=tfplan
 

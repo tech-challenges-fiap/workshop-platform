@@ -93,6 +93,7 @@ resource "helm_release" "datadog" {
   timeout          = 600
   wait             = false
   wait_for_jobs    = false
+  recreate_pods    = true
 
   set = [
     {

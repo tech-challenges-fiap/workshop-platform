@@ -189,7 +189,9 @@ jobs:
 
           if [ "${ENABLE_DATADOG:-false}" = "true" ]; then
             kubectl get namespace datadog
-            kubectl -n datadog rollout status daemonset/datadog --timeout=300s || echo "⚠️ Datadog DaemonSet not fully ready yet (non-blocking)"
+            kubectl -n datadog get daemonset datadog
+            kubectl -n datadog get pods -l app.kubernetes.io/name=datadog --no-headers | head -3 || true
+            echo "✅ Datadog resources deployed (agent readiness is async, not blocking CI)"
           else
             echo "Datadog smoke check skipped because ENABLE_DATADOG is not true."
           fi

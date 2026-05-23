@@ -128,6 +128,18 @@ resource "helm_release" "datadog" {
       value = "true"
     },
     {
+      name  = "datadog.otlp.receiver.protocols.http.enabled"
+      value = "true"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.http.endpoint"
+      value = "0.0.0.0:4318"
+    },
+    {
+      name  = "datadog.otlp.receiver.protocols.http.useHostPort"
+      value = "true"
+    },
+    {
       name  = "datadog.env[0].name"
       value = "DD_ENV"
     },

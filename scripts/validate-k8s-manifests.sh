@@ -2,6 +2,21 @@
 
 set -euo pipefail
 
+REQUIRED_DIRS=(
+  "kubernetes/base/rabbitmq"
+  "kubernetes/base/observability"
+  "kubernetes/base/services/order-service"
+  "kubernetes/base/services/billing-service"
+  "kubernetes/base/services/execution-service"
+)
+
+for dir in "${REQUIRED_DIRS[@]}"; do
+  if [[ ! -d "$dir" ]]; then
+    echo "Required manifest directory missing: $dir"
+    exit 1
+  fi
+done
+
 mapfile -t files < <(find kubernetes -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
 
 if [[ "${#files[@]}" -eq 0 ]]; then

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: stag
+  labels:
+    app.kubernetes.io/name: order-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: workshop-phase-4
+    app.kubernetes.io/managed-by: workshop-platform
+    observability.workshop.io/correlation-id: enabled
+  annotations:
+    observability.workshop.io/correlation-http-header: X-Correlation-Id
+    observability.workshop.io/correlation-message-header: correlationId
+    observability.workshop.io/correlation-log-field: correlationId
+    observability.workshop.io/correlation-metrics-label: correlation_id
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: order-service
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: order-service
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: workshop-phase-4
+        observability.workshop.io/correlation-id: enabled
+      annotations:
+        observability.workshop.io/correlation-http-header: X-Correlation-Id
+        observability.workshop.io/correlation-message-header: correlationId
+        observability.workshop.io/correlation-log-field: correlationId
+        observability.workshop.io/correlation-metrics-label: correlation_id
+    spec:
+      containers:
+        - name: order-service
+          image: example.invalid/workshop/order-service:replace-me
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: order-service-config
+            - configMapRef:
+                name: correlation-observability-config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

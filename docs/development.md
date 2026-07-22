@@ -24,6 +24,12 @@ cd ..
 ./scripts/validate-k8s-manifests.sh
 ```
 
+The Kubernetes base includes platform manifest directories for namespaces,
+RabbitMQ, Phase 4 services, and shared observability conventions. The
+observability conventions are configuration placeholders only; service
+repositories still own correlation ID middleware, RabbitMQ propagation, log
+formatting, and metrics emission.
+
 Plan a real environment when AWS credentials are available:
 
 ```bash
@@ -78,6 +84,7 @@ one shared cluster. When Datadog is enabled, set the `DATADOG_API_KEY` secret.
 - Keep docs faithful to Terraform and manifests that exist in this repository
 - When Terraform, manifest layout, commands, or workflows change, update the docs in the same change
 - Keep application deployment behavior and database provisioning documented in their owning repositories
+- Keep application observability instrumentation documented in owning service repositories; this repository only documents platform-level correlation configuration and metadata conventions
 
 ## When To Update Documentation
 

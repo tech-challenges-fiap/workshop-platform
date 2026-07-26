@@ -255,12 +255,19 @@ curl -fsS -X POST "http://<workshop-app-ingress-or-portforward>/work-orders" \
   -d '{"...": "..."}'
 
 # 4. Tail the collector logs and grep for the correlationId that shows up in
-#    workshop-app's own structured logs for that request:
+#    the Order Service (OS / workshop-app)'s own structured logs for that
+#    request:
 kubectl logs -n stag deployment/otel-collector -f | grep -i correlationId
 
 # 5. Cross-check the same correlationId (or X-Correlation-Id header value)
-#    appears in each service's own structured logs:
-kubectl logs -n stag deployment/workshop-app       | grep -i correlationId
+#    appears in each service's own structured logs. Use the Deployment names
+#    defined in this repository's kubernetes/base/services/*/deployment.yaml
+#    (order-service is the OS Deployment name here; the workshop-app repo's
+#    own overlay may deploy the same workload under a different Deployment
+#    name such as "workshop-app" if it is applied instead of/alongside the
+#    platform placeholder — check `kubectl get deploy -n stag` and use the
+#    name that is actually running):
+kubectl logs -n stag deployment/order-service      | grep -i correlationId
 kubectl logs -n stag deployment/billing-service    | grep -i correlationId
 kubectl logs -n stag deployment/execution-service  | grep -i correlationId
 
@@ -269,5 +276,16 @@ kubectl logs -n stag deployment/execution-service  | grep -i correlationId
 #    resources created only for the evidence run.
 ```
 
-This addendum does not create an OpenSpec change, per the Fase 4 closure
-plan: this gap is documented as an addendum only.
+### OpenSpec governance
+
+This addendum's runnable artifacts (`docker-compose.otel.yml`,
+`observability/otel-collector/otel-collector-config.yaml`) are governed by
+the OpenSpec change `f4-platform-otel-collector-evidence` under
+`openspec/changes/f4-platform-otel-collector-evidence/`, validated with:
+
+```bash
+npx --yes @fission-ai/openspec validate f4-platform-otel-collector-evidence --strict
+```
+
+The change is archived after this PR merges to `stag`, per this
+repository's standard OpenSpec workflow.

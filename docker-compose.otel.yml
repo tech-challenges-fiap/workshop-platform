@@ -25,8 +25,12 @@ services:
     volumes:
       - ./observability/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
     ports:
-      - "4317:4317" # OTLP gRPC receiver
-      - "4318:4318" # OTLP HTTP receiver
+      # Bound explicitly to loopback: bare "4317:4317" style mappings publish
+      # on every host network interface, which would let other hosts on the
+      # network submit OTLP data to this local-only, unauthenticated debug
+      # collector. This tool is local-only by design, so keep it on 127.0.0.1.
+      - "127.0.0.1:4317:4317" # OTLP gRPC receiver (loopback only)
+      - "127.0.0.1:4318:4318" # OTLP HTTP receiver (loopback only)
     networks:
       - otel-evidence-net
 

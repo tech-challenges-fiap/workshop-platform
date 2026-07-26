@@ -2,3 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespaces.yaml
+  - rabbitmq/configmap.yaml
+  - rabbitmq/secret.yaml
+  - rabbitmq/statefulset.yaml
+  - rabbitmq/service.yaml
+  - rabbitmq/service-headless.yaml
+  - observability/correlation-configmap.yaml
+  - services/order-service/configmap.yaml
+  - services/order-service/service.yaml
+  - services/order-service/deployment.yaml
+  - services/billing-service/configmap.yaml
+  - services/billing-service/service.yaml
+  - services/billing-service/deployment.yaml
+  - services/execution-service/configmap.yaml
+  - services/execution-service/service.yaml
+  - services/execution-service/deployment.yaml

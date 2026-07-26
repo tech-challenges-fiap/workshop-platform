@@ -105,3 +105,6 @@ pull request read/write permission.
 - [docs/architecture.md](docs/architecture.md) - repository boundaries and platform architecture
 - [docs/development.md](docs/development.md) - Terraform/Kubernetes workflow, validation, and documentation rules
 - [AGENTS.md](AGENTS.md) - instructions for AI contributors
+
+Transversal architecture documentation (component diagrams, sequence diagrams, ER model, RFCs, ADRs) is
+maintained in [workshop-app/docs](https://github.com/tech-challenges-fiap/workshop-app/blob/stag/docs/README.md).

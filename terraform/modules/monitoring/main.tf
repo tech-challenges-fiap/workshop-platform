@@ -7,6 +7,9 @@ resource "datadog_dashboard_json" "api_latency" {
     title       = "Workshop - API Latency"
     description = "p50/p95/p99 latency of workshop-app endpoints"
     layout_type = "ordered"
+    template_variables = [
+      { name = "env", prefix = "env", default = "*" }
+    ]
     widgets = [
       {
         definition = {
@@ -14,17 +17,17 @@ resource "datadog_dashboard_json" "api_latency" {
           title = "Request Latency (p50/p95/p99)"
           requests = [
             {
-              q            = "p50:trace.http.server.request{service:${var.service_name}} by {resource_name}"
+              q            = "p50:trace.http.server.request{service:${var.service_name},env:$env} by {resource_name}"
               display_type = "line"
               style        = { palette = "cool" }
             },
             {
-              q            = "p95:trace.http.server.request{service:${var.service_name}} by {resource_name}"
+              q            = "p95:trace.http.server.request{service:${var.service_name},env:$env} by {resource_name}"
               display_type = "line"
               style        = { palette = "warm" }
             },
             {
-              q            = "p99:trace.http.server.request{service:${var.service_name}} by {resource_name}"
+              q            = "p99:trace.http.server.request{service:${var.service_name},env:$env} by {resource_name}"
               display_type = "line"
               style        = { palette = "orange" }
             }
@@ -90,6 +93,9 @@ resource "datadog_dashboard_json" "health_uptime" {
     title       = "Workshop - Health & Uptime"
     description = "/health success rate and uptime"
     layout_type = "ordered"
+    template_variables = [
+      { name = "env", prefix = "env", default = "*" }
+    ]
     widgets = [
       {
         definition = {
@@ -97,7 +103,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Endpoint Success Rate"
           requests = [
             {
-              q          = "100 * (sum:trace.http.server.request.hits{service:${var.service_name},http.status_code:200}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name}}.as_count())"
+              q          = "100 * (sum:trace.http.server.request.hits{service:${var.service_name},env:$env,http.status_code:200}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name},env:$env}.as_count())"
               aggregator = "avg"
             }
           ]
@@ -110,7 +116,7 @@ resource "datadog_dashboard_json" "health_uptime" {
           title = "Health Check Responses Over Time"
           requests = [
             {
-              q            = "sum:trace.http.server.request.hits{service:${var.service_name}} by {http.status_code}.as_count()"
+              q            = "sum:trace.http.server.request.hits{service:${var.service_name},env:$env} by {http.status_code}.as_count()"
               display_type = "bars"
             }
           ]
@@ -127,6 +133,9 @@ resource "datadog_dashboard_json" "business_orders" {
     title       = "Workshop - Business Orders"
     description = "Daily order volume and average time per status"
     layout_type = "ordered"
+    template_variables = [
+      { name = "env", prefix = "env", default = "*" }
+    ]
     widgets = [
       {
         definition = {
@@ -134,7 +143,7 @@ resource "datadog_dashboard_json" "business_orders" {
           title = "Work Orders Created (daily)"
           requests = [
             {
-              q            = "sum:workshop_app_work_orders_created_total{*}.as_count().rollup(sum, 86400)"
+              q            = "sum:workshop_app_work_orders_created_total{env:$env}.as_count().rollup(sum, 86400)"
               display_type = "bars"
             }
           ]
@@ -146,7 +155,7 @@ resource "datadog_dashboard_json" "business_orders" {
           title = "Status Changes"
           requests = [
             {
-              q            = "sum:workshop_app_work_order_status_changes_total{*} by {from_status,to_status}.as_count()"
+              q            = "sum:workshop_app_work_order_status_changes_total{env:$env} by {from_status,to_status}.as_count()"
               display_type = "bars"
             }
           ]
@@ -158,7 +167,7 @@ resource "datadog_dashboard_json" "business_orders" {
           title = "Avg Duration per Status (seconds)"
           requests = [
             {
-              q            = "avg:workshop_app_work_order_duration_seconds{*} by {status}"
+              q            = "avg:workshop_app_work_order_duration_seconds{env:$env} by {status}"
               display_type = "line"
             }
           ]
@@ -175,6 +184,9 @@ resource "datadog_dashboard_json" "errors_integrations" {
     title       = "Workshop - Errors & Integrations"
     description = "5xx rate, integration errors, auth failures"
     layout_type = "ordered"
+    template_variables = [
+      { name = "env", prefix = "env", default = "*" }
+    ]
     widgets = [
       {
         definition = {
@@ -182,7 +194,7 @@ resource "datadog_dashboard_json" "errors_integrations" {
           title = "5xx Error Rate"
           requests = [
             {
-              q            = "sum:trace.http.server.request.errors{service:${var.service_name}}.as_count()"
+              q            = "sum:trace.http.server.request.errors{service:${var.service_name},env:$env}.as_count()"
               display_type = "bars"
               style        = { palette = "red" }
             }
@@ -195,7 +207,7 @@ resource "datadog_dashboard_json" "errors_integrations" {
           title = "Integration Errors"
           requests = [
             {
-              q            = "sum:workshop_app_integration_errors_total{*} by {target}.as_count()"
+              q            = "sum:workshop_app_integration_errors_total{env:$env} by {target}.as_count()"
               display_type = "bars"
             }
           ]
@@ -207,7 +219,7 @@ resource "datadog_dashboard_json" "errors_integrations" {
           title = "Auth Failures"
           requests = [
             {
-              q            = "sum:workshop_app_auth_failures_total{*} by {reason}.as_count()"
+              q            = "sum:workshop_app_auth_failures_total{env:$env} by {reason}.as_count()"
               display_type = "bars"
               style        = { palette = "orange" }
             }
@@ -231,7 +243,7 @@ resource "datadog_monitor" "service_down" {
   type    = "query alert"
   message = "Service ${var.service_name} health endpoint is returning errors. ${local.notify_targets}"
 
-  query = "sum(last_2m):sum:trace.http.server.request.hits{service:${var.service_name},http.status_code:200}.as_count() < 1"
+  query = "sum(last_2m):sum:trace.http.server.request.hits{service:${var.service_name},http.status_code:200} by {env}.as_count() < 1"
 
   monitor_thresholds {
     critical = 1
@@ -240,7 +252,7 @@ resource "datadog_monitor" "service_down" {
   notify_no_data    = true
   no_data_timeframe = 5
 
-  tags = ["service:${var.service_name}", "team:workshop"]
+  tags = ["service:${var.service_name}", "team:workshop", "env:{{env.name}}"]
 }
 
 resource "datadog_monitor" "error_rate_spike" {
@@ -250,14 +262,14 @@ resource "datadog_monitor" "error_rate_spike" {
   type    = "metric alert"
   message = "High 5xx error rate detected for ${var.service_name}. ${local.notify_targets}"
 
-  query = "avg(last_5m):( sum:trace.http.server.request.errors{service:${var.service_name}}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name}}.as_count() ) * 100 > 5"
+  query = "avg(last_5m):( sum:trace.http.server.request.errors{service:${var.service_name}} by {env}.as_count() / sum:trace.http.server.request.hits{service:${var.service_name}} by {env}.as_count() ) * 100 > 5"
 
   monitor_thresholds {
     critical = 5
     warning  = 2
   }
 
-  tags = ["service:${var.service_name}", "team:workshop"]
+  tags = ["service:${var.service_name}", "team:workshop", "env:{{env.name}}"]
 }
 
 resource "datadog_monitor" "auth_failures" {
@@ -267,14 +279,14 @@ resource "datadog_monitor" "auth_failures" {
   type    = "metric alert"
   message = "High number of authentication failures detected. ${local.notify_targets}"
 
-  query = "sum(last_5m):sum:workshop_app_auth_failures_total{*}.as_count() > 50"
+  query = "sum(last_5m):sum:workshop_app_auth_failures_total{*} by {env}.as_count() > 50"
 
   monitor_thresholds {
     critical = 50
     warning  = 20
   }
 
-  tags = ["service:${var.service_name}", "team:workshop"]
+  tags = ["service:${var.service_name}", "team:workshop", "env:{{env.name}}"]
 }
 
 resource "datadog_monitor" "os_processing_failure" {
@@ -284,14 +296,14 @@ resource "datadog_monitor" "os_processing_failure" {
   type    = "metric alert"
   message = "Repeated integration errors in order processing. ${local.notify_targets}"
 
-  query = "sum(last_5m):sum:workshop_app_integration_errors_total{*}.as_count() > 10"
+  query = "sum(last_5m):sum:workshop_app_integration_errors_total{*} by {env}.as_count() > 10"
 
   monitor_thresholds {
     critical = 10
     warning  = 5
   }
 
-  tags = ["service:${var.service_name}", "team:workshop"]
+  tags = ["service:${var.service_name}", "team:workshop", "env:{{env.name}}"]
 }
 
 resource "datadog_monitor" "cpu_saturation" {

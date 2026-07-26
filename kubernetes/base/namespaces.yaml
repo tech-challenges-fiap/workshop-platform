@@ -13,3 +13,10 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: workshop-platform
     workshop.fiap.io/environment: prod
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rabbitmq
+  labels:
+    app.kubernetes.io/managed-by: workshop-platform

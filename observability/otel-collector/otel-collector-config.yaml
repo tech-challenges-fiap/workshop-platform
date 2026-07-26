@@ -1,0 +1,37 @@
+# Minimal local OpenTelemetry Collector pipeline for Phase 4 correlation-id
+# evidence capture (gap #6 of the Fase 4 closure plan).
+#
+# Scope: local-only, zero-cost evidence tooling. This file is NOT a Kubernetes
+# manifest and does not deploy anything to AWS/EKS. It receives OTLP
+# (gRPC + HTTP) from services and exports what it receives to the collector's
+# own stdout via the `debug` exporter (the current name for what used to be
+# the `logging` exporter in older collector releases) so a human can grep the
+# container logs for a `correlationId` value that shows up across
+# workshop-app (OS) -> workshop-billing -> workshop-execution spans/logs.
+#
+# No Datadog exporter, no AWS exporter, no external network calls are
+# configured here.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [debug]
+    logs:
+      receivers: [otlp]
+      exporters: [debug]
+    metrics:
+      receivers: [otlp]
+      exporters: [debug]

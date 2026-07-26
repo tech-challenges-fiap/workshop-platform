@@ -30,6 +30,24 @@ observability conventions are configuration placeholders only; service
 repositories still own correlation ID middleware, RabbitMQ propagation, log
 formatting, and metrics emission.
 
+### Local OTel Collector Evidence Tool (Optional)
+
+`docker-compose.otel.yml` (repo root) and
+`observability/otel-collector/otel-collector-config.yaml` run a standalone,
+local, zero-cost OpenTelemetry Collector for capturing correlation-id
+evidence during manual testing. It is not part of the Kubernetes base, is
+not wired into `kustomization.yaml`, and does not touch Datadog or AWS:
+
+```bash
+docker compose -f docker-compose.otel.yml up -d
+docker compose -f docker-compose.otel.yml logs -f otel-collector
+docker compose -f docker-compose.otel.yml down
+```
+
+See `docs/evidence/fase-4/f4-platform-correlation-observability.md` for the
+addendum documenting the synthetic smoke test and the pending human steps to
+capture full cross-service evidence inside a `kind` cluster.
+
 Plan a real environment when AWS credentials are available:
 
 ```bash

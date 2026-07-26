@@ -1,0 +1,39 @@
+# Local, zero-cost OpenTelemetry Collector for Phase 4 correlation-id evidence
+# capture (Fase 4 closure plan gap #6 - lowest priority, minimal scope).
+#
+# This is a standalone local development/evidence compose file. It does not
+# touch Datadog, AWS, or any resource provisioned by terraform/ or
+# kubernetes/. It exists so a human can point workshop-app, workshop-billing,
+# and workshop-execution's OTLP exporters (OTEL_EXPORTER_OTLP_ENDPOINT) at a
+# local collector and capture the same correlationId showing up across
+# traces/logs for a request that flows OS -> Billing -> Execution.
+#
+# Usage:
+#   docker-compose -f docker-compose.otel.yml up -d
+#   docker-compose -f docker-compose.otel.yml logs -f otel-collector
+#   docker-compose -f docker-compose.otel.yml down
+#
+# See docs/evidence/fase-4/f4-platform-correlation-observability.md for the
+# addendum documenting how this is used together with the gap #2 (Kubernetes
+# parity / kind cluster) work.
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    container_name: workshop-platform-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./observability/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      # Bound explicitly to loopback: bare "4317:4317" style mappings publish
+      # on every host network interface, which would let other hosts on the
+      # network submit OTLP data to this local-only, unauthenticated debug
+      # collector. This tool is local-only by design, so keep it on 127.0.0.1.
+      - "127.0.0.1:4317:4317" # OTLP gRPC receiver (loopback only)
+      - "127.0.0.1:4318:4318" # OTLP HTTP receiver (loopback only)
+    networks:
+      - otel-evidence-net
+
+networks:
+  otel-evidence-net:
+    driver: bridge
